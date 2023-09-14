@@ -1,17 +1,25 @@
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Web.Data;
+global using Infrastructure.Data;
+global using Infrastructure.Identity;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.EntityFrameworkCore;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+
+builder.Services.AddDbContext<CoffeeMateContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeMateContext")));
+
+builder.Services.AddDbContext<AppIdentityContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AppIdentityContext")));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppIdentityContext>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -40,4 +48,16 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-app.Run();
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<CoffeeMateContext>();
+
+    await CoffeeMateContextSeed.SeedAsync(dbContext); 
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+
+    await AppIdentityContextSeed.SeedAsync(roleManager, userManager);
+}
+
+    app.Run();
