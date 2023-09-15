@@ -2,7 +2,13 @@ global using Infrastructure.Data;
 global using Infrastructure.Identity;
 global using Microsoft.AspNetCore.Identity;
 global using Microsoft.EntityFrameworkCore;
-
+global using Web.Areas.Admin.Models;
+using Web.Areas.Admin.Interfaces;
+using Web.Areas.Admin.Services;
+using ApplicationCore.Interfaces;
+using Web.Interfaces;
+using Web.Models;
+using Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +19,12 @@ builder.Services.AddDbContext<CoffeeMateContext>(options =>
 
 builder.Services.AddDbContext<AppIdentityContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AppIdentityContext")));
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+
+builder.Services.AddScoped<IHomeViewModelService, HomeViewModelService>();
+
+builder.Services.AddScoped<IProductsViewModelService, ProductsViewModelService>();
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -42,6 +54,11 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapControllerRoute(
+            name: "areas",
+            pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
+          );
 
 app.MapControllerRoute(
     name: "default",

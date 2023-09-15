@@ -1,0 +1,46 @@
+﻿@model ProductsViewModel
+@{
+    ViewBag.Title = "Products";
+}
+
+<a asp-action="Create" class="btn btn-success mb-3">Create Product<i class="fas-solid fa-plus"></i></a>
+
+<table id="datatablesSimple" class="table">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Picture</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Stock</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>@product.Id</td>
+                <td><img src="~/img/product/@product.PictureUri" width="100px" /></td>
+                <td>@product.Name</td>
+                <td>@product.Description</td>
+                <td>@product.Price</td>
+                <td>@product.StockAmount</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+    <script>
+        const datatablesSimple = document.getElementById('datatablesSimple');
+        if (datatablesSimple) {
+            new simpleDatatables.DataTable(datatablesSimple);
+        }
+    </script>
+}
