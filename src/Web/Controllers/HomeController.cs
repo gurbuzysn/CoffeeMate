@@ -17,12 +17,29 @@ namespace Web.Controllers
             _homeViewModelService = homeViewModelService;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
+        {
+            return View();
+        }
+
+        public IActionResult About()
+        {
+            return View();
+        }
+
+
+        public async  Task<IActionResult> Product()
         {
             var products = await _homeViewModelService.GetHomeViewModelAsync();
 
             return View(products);
         }
+
+       
+
+
+
+
 
         public IActionResult Privacy()
         {

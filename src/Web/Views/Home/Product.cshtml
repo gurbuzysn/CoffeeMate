@@ -1,0 +1,21 @@
+﻿@model HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="row">
+    @foreach (var item in Model.Products)
+    {
+        <div class="col-sm-6 col-md-4 col-xl-3 mb-4">
+            <div class="card" style="width: 18rem;">
+                <img src="~/img/product/@item.PictureUri" class="card-img-top" style="width: 18rem">
+                <div class="card-body">
+                    <h5 class="card-title" title="@item.Name">@item.Name</h5>
+                    <p class="card-text">@item.Description</p>
+                    <p class="card-text">@item.Price.ToString("c2")</p>
+                </div>
+                <a href="#" class="btn" style="background: linear-gradient(to right, #CDFFD8, #94B9FF) !important; font-family: 'Roboto', sans-serif;">Add to Cart<i class="fa-solid fa-cart-plus"></i></a>
+            </div>
+        </div>
+    }
+</div>
